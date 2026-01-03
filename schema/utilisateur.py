@@ -1,12 +1,13 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
+from schema.enums import RoleEnum
 
 class UtilisateurBase(BaseModel):
     nom: str
     prenom: str
     email: EmailStr
-    role: str
+    role: RoleEnum
 
 class UtilisateurCreate(UtilisateurBase):
     mot_de_passe: str
@@ -17,3 +18,13 @@ class UtilisateurRead(UtilisateurBase):
 
     class Config:
         from_attributes = True
+
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    mot_de_passe: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"

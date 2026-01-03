@@ -1,9 +1,11 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+from schema.enums import StatutAlerteEnum
+
 class AlerteStockCreate(BaseModel):
     message: str
-    statut: str
+    statut: StatutAlerteEnum = StatutAlerteEnum.NON_TRAITEE
     seuil_declencheur: int
     id_produit: int
 

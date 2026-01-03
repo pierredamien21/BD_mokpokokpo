@@ -1,11 +1,13 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+from schema.enums import StatutReservationEnum
+
 class ReservationBase(BaseModel):
-    statut: str
+    statut: StatutReservationEnum = StatutReservationEnum.EN_ATTENTE
 
 class ReservationCreate(ReservationBase):
-    id_client: int
+    id_utilisateur: int
 
 class ReservationRead(ReservationBase):
     id_reservation: int

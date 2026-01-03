@@ -1,5 +1,63 @@
-# Environnement virtuel
+# --- Environnement ---
 nouveau_env/
-
-# Variables d'environnement
+venv/
+env/
 .env
+.venv/
+bin/
+lib/
+include/
+share/
+
+# --- Python / Cache ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- Tests ---
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+.noserc
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.cache/
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- Database ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Divers ---
+*.log
+tmp/
+temp/
