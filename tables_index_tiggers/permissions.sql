@@ -1,94 +1,111 @@
 -- =====================================================
--- GESTION DES RÔLES ET PERMISSIONS
--- Base : Mokpokpo
--- =====================================================
--- Objectif :
--- Définir des rôles PostgreSQL correspondant
--- aux acteurs métier de l'application.
---
--- Principe :
--- - Chaque rôle a des droits limités
--- - Sécurité appliquée au niveau BD
--- - Respect du principe du moindre privilège
+-- ROLES & PERMISSIONS - Projet Mokpokpo
+-- SGBD : PostgreSQL
+-- Schéma : public
 -- =====================================================
 
--- =====================================================
--- 1 CRÉATION DES RÔLES
--- =====================================================
-
--- Rôle CLIENT :
--- Peut consulter les produits
--- Peut créer des commandes et réservations
-CREATE ROLE role_client NOINHERIT;
-
--- Rôle GESTIONNAIRE COMMERCIAL :
--- Peut gérer commandes, ventes et produits
-CREATE ROLE role_gest_commercial NOINHERIT;
-
--- Rôle GESTIONNAIRE DE STOCK :
--- Peut gérer le stock et consulter les alertes
-CREATE ROLE role_gest_stock NOINHERIT;
-
--- Rôle ADMINISTRATEUR :
--- Accès complet à la base
-CREATE ROLE role_admin NOINHERIT;
+SET search_path TO public;
 
 -- =====================================================
--- 2 RÉVOCATION PAR SÉCURITÉ (bonne pratique)
+-- 1 CRÉATION DES RÔLES (SI NON EXISTANTS)
 -- =====================================================
--- On retire tous les droits par défaut sur le schéma
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
-REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC;
-REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'role_admin') THEN
+        CREATE ROLE role_admin;
+    END IF;
+
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'role_gestionnaire_commercial') THEN
+        CREATE ROLE role_gestionnaire_commercial;
+    END IF;
+
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'role_gestionnaire_stock') THEN
+        CREATE ROLE role_gestionnaire_stock;
+    END IF;
+
+    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'role_client') THEN
+        CREATE ROLE role_client;
+    END IF;
+END $$;
 
 -- =====================================================
--- 3 PERMISSIONS POUR LE RÔLE CLIENT
+-- 2 NETTOYAGE : RÉINITIALISER LES DROITS EXISTANTS
 -- =====================================================
--- Consultation des produits
-GRANT SELECT ON produit TO role_client;
 
--- Création et consultation de ses commandes / réservations
-GRANT SELECT, INSERT ON commande, reservation TO role_client;
-GRANT SELECT, INSERT ON ligne_commande, ligne_reservation TO role_client;
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM role_admin;
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM role_gestionnaire_commercial;
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM role_gestionnaire_stock;
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM role_client;
 
--- =====================================================
--- 4PERMISSIONS POUR LE GESTIONNAIRE COMMERCIAL
--- =====================================================
--- Gestion des produits (prix, description)
-GRANT SELECT, INSERT, UPDATE ON produit TO role_gest_commercial;
-
--- Consultation et validation des commandes / réservations
-GRANT SELECT, UPDATE ON commande, reservation TO role_gest_commercial;
-
--- Accès aux ventes
-GRANT SELECT, INSERT ON vente TO role_gest_commercial;
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM role_admin;
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM role_gestionnaire_commercial;
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM role_gestionnaire_stock;
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM role_client;
 
 -- =====================================================
--- 5 PERMISSIONS POUR LE GESTIONNAIRE DE STOCK
+-- 3 PERMISSIONS : ADMINISTRATEUR
 -- =====================================================
--- Gestion du stock
-GRANT SELECT, UPDATE ON stock TO role_gest_stock;
+-- Accès total au système
 
--- Consultation des produits
-GRANT SELECT ON produit TO role_gest_stock;
-
--- Consultation des alertes de stock
-GRANT SELECT, UPDATE ON alerte_stock TO role_gest_stock;
-
--- =====================================================
--- 6 PERMISSIONS POUR L’ADMINISTRATEUR
--- =====================================================
--- Accès total à toutes les tables
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO role_admin;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO role_admin;
-GRANT ALL PRIVILEGES ON SCHEMA public TO role_admin;
 
 -- =====================================================
--- 7 EXEMPLE : ASSIGNATION D’UN RÔLE À UN UTILISATEUR
+-- 4 PERMISSIONS : GESTIONNAIRE COMMERCIAL
 -- =====================================================
--- Exemple (à adapter selon tes users PostgreSQL)
--- GRANT role_client TO nom_utilisateur_pg;
+-- Gère produits, commandes, ventes, réservations
+
+GRANT SELECT, INSERT, UPDATE
+ON produit, commande, ligne_commande, reservation, ligne_reservation, vente
+TO role_gestionnaire_commercial;
+
+GRANT SELECT
+ON utilisateur, client
+TO role_gestionnaire_commercial;
+
+GRANT USAGE, SELECT
+ON ALL SEQUENCES IN SCHEMA public
+TO role_gestionnaire_commercial;
 
 -- =====================================================
--- FIN DU SCRIPT RÔLES & PERMISSIONS
+-- 5 PERMISSIONS : GESTIONNAIRE DE STOCK
+-- =====================================================
+-- Gère stock et alertes
+
+GRANT SELECT, INSERT, UPDATE
+ON stock, alerte_stock
+TO role_gestionnaire_stock;
+
+GRANT SELECT
+ON produit
+TO role_gestionnaire_stock;
+
+GRANT USAGE, SELECT
+ON ALL SEQUENCES IN SCHEMA public
+TO role_gestionnaire_stock;
+
+-- =====================================================
+-- 6️⃣ PERMISSIONS : CLIENT
+-- =====================================================
+-- Consultation + commandes / réservations
+
+GRANT SELECT
+ON produit
+TO role_client;
+
+GRANT SELECT, INSERT
+ON commande, ligne_commande, reservation, ligne_reservation
+TO role_client;
+
+GRANT SELECT
+ON vente
+TO role_client;
+
+GRANT USAGE, SELECT
+ON ALL SEQUENCES IN SCHEMA public
+TO role_client;
+
+-- =====================================================
+-- FIN DU SCRIPT
 -- =====================================================

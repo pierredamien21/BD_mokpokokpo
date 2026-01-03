@@ -1,16 +1,17 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from datetime import datetime
 from decimal import Decimal
 
-class CommandeCreate(BaseModel):
-    id_client: int
+class CommandeBase(BaseModel):
     statut: str
 
-class CommandeOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    
+class CommandeCreate(CommandeBase):
+    id_client: int
+
+class CommandeRead(CommandeBase):
     id_commande: int
     date_commande: datetime
     montant_total: Decimal
-    statut: str
-    id_client: int
+
+    class Config:
+        from_attributes = True

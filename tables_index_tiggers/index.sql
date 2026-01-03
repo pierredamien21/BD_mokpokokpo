@@ -1,53 +1,123 @@
--- =========================================
--- INDEX - Optimisation Base Mokpokpo
+-- =====================================================
+-- INDEX COMPLETS - Projet Mokpokpo
+-- Méthode : Table mère + tables par rôle
 -- Schéma : public
--- =========================================
+-- =====================================================
 
 SET search_path TO public;
 
--- 🔹 Index sur clés étrangères (JOIN & performance)
+-- =====================================================
+-- 🔹 UTILISATEUR (classe mère)
+-- =====================================================
 
-CREATE INDEX idx_client_utilisateur
-    ON client(id_utilisateur);
+-- Recherche par email (login)
+CREATE UNIQUE INDEX idx_utilisateur_email
+ON utilisateur(email);
 
-CREATE INDEX idx_commande_client
-    ON commande(id_client);
+-- =====================================================
+-- 🔹 CLIENT (rôle : client)
+-- =====================================================
 
-CREATE INDEX idx_ligne_commande_commande
-    ON ligne_commande(id_commande);
+CREATE UNIQUE INDEX idx_client_utilisateur
+ON client(id_utilisateur);
 
-CREATE INDEX idx_ligne_commande_produit
-    ON ligne_commande(id_produit);
+CREATE INDEX idx_client_telephone
+ON client(telephone);
 
-CREATE INDEX idx_stock_produit
-    ON stock(id_produit);
+-- =====================================================
+-- 🔹 GESTIONNAIRE STOCK
+-- =====================================================
 
-CREATE INDEX idx_reservation_client
-    ON reservation(id_client);
+CREATE UNIQUE INDEX idx_gestionnaire_stock_utilisateur
+ON gestionnaire_stock(id_utilisateur);
 
-CREATE INDEX idx_ligne_reservation_reservation
-    ON ligne_reservation(id_reservation);
+-- =====================================================
+-- 🔹 GESTIONNAIRE COMMERCIAL
+-- =====================================================
 
-CREATE INDEX idx_ligne_reservation_produit
-    ON ligne_reservation(id_produit);
+CREATE UNIQUE INDEX idx_gestionnaire_commercial_utilisateur
+ON gestionnaire_commercial(id_utilisateur);
 
-CREATE INDEX idx_vente_commande
-    ON vente(id_commande);
+-- =====================================================
+-- 🔹 ADMINISTRATEUR
+-- =====================================================
 
-CREATE INDEX idx_alerte_produit
-    ON alerte_stock(id_produit);
+CREATE UNIQUE INDEX idx_administrateur_utilisateur
+ON administrateur(id_utilisateur);
 
--- 🔹 Index métier (recherches fréquentes)
+-- =====================================================
+-- 🔹 PRODUIT
+-- =====================================================
 
 CREATE INDEX idx_produit_nom
-    ON produit(nom_produit);
+ON produit(nom_produit);
+
+CREATE INDEX idx_produit_type
+ON produit(type_produit);
+
+-- =====================================================
+-- 🔹 STOCK
+-- =====================================================
+
+CREATE UNIQUE INDEX idx_stock_produit
+ON stock(id_produit);
+
+CREATE INDEX idx_stock_quantite
+ON stock(quantite_disponible);
+
+-- =====================================================
+-- 🔹 COMMANDE
+-- =====================================================
+
+CREATE INDEX idx_commande_client
+ON commande(id_client);
 
 CREATE INDEX idx_commande_statut
-    ON commande(statut);
+ON commande(statut);
 
 CREATE INDEX idx_commande_date
-    ON commande(date_commande);
+ON commande(date_commande);
 
--- =========================================
+-- =====================================================
+-- 🔹 LIGNE_COMMANDE
+-- =====================================================
+
+CREATE INDEX idx_ligne_commande_commande
+ON ligne_commande(id_commande);
+
+CREATE INDEX idx_ligne_commande_produit
+ON ligne_commande(id_produit);
+
+-- =====================================================
+-- 🔹 RESERVATION
+-- =====================================================
+
+CREATE INDEX idx_reservation_client
+ON reservation(id_client);
+
+CREATE INDEX idx_reservation_statut
+ON reservation(statut);
+
+-- =====================================================
+-- 🔹 VENTE
+-- =====================================================
+
+CREATE UNIQUE INDEX idx_vente_commande
+ON vente(id_commande);
+
+CREATE INDEX idx_vente_date
+ON vente(date_vente);
+
+-- =====================================================
+-- 🔹 ALERTE_STOCK
+-- =====================================================
+
+CREATE INDEX idx_alerte_produit
+ON alerte_stock(id_produit);
+
+CREATE INDEX idx_alerte_statut
+ON alerte_stock(statut);
+
+-- =====================================================
 -- FIN DES INDEX
--- =========================================
+-- =====================================================
