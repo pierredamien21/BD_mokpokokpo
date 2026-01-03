@@ -1,12 +1,15 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from datetime import datetime
 
-class AlerteStockOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    
-    id_alerte: int
-    date_alerte: datetime
+class AlerteStockCreate(BaseModel):
     message: str
     statut: str
     seuil_declencheur: int
     id_produit: int
+
+class AlerteStockRead(AlerteStockCreate):
+    id_alerte: int
+    date_alerte: datetime
+
+    class Config:
+        from_attributes = True

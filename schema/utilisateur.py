@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
+from typing import Optional
 
 class UtilisateurBase(BaseModel):
     nom: str
@@ -10,8 +11,9 @@ class UtilisateurBase(BaseModel):
 class UtilisateurCreate(UtilisateurBase):
     mot_de_passe: str
 
-class UtilisateurOut(UtilisateurBase):
-    model_config = ConfigDict(from_attributes=True)
-    
+class UtilisateurRead(UtilisateurBase):
     id_utilisateur: int
     date_creation: datetime
+
+    class Config:
+        from_attributes = True

@@ -1,20 +1,19 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+
 from database import get_db
 from models.model import LigneCommande
-from schema.ligne_commande import LigneCommandeCreate, LigneCommandeOut
+from schema.ligne_commande import LigneCommandeCreate, LigneCommandeRead
 
-router = APIRouter(prefix="/lignes-commandes", tags=["LignesCommandes"])
+router = APIRouter(
+    prefix="/ligne-commandes",
+    tags=["Lignes Commande"]
+)
 
-@router.post("/", response_model=LigneCommandeOut)
-def create_ligne_commande(ligne: LigneCommandeCreate, db: Session = Depends(get_db)):
-    db_ligne = LigneCommande(**ligne.model_dump())
-    db.add(db_ligne)
+@router.post("/", response_model=LigneCommandeRead)
+def create_ligne_commande(data: LigneCommandeCreate, db: Session = Depends(get_db)):
+    ligne = LigneCommande(**data.model_dump())
+    db.add(ligne)
     db.commit()
-    db.refresh(db_ligne)
-    return db_ligne
-
-@router.get("/", response_model=list[LigneCommandeOut])
-def get_lignes_commandes(db: Session = Depends(get_db)):
-    return db.query(LigneCommande).all()
-
+    db.refresh(ligne)
+    return ligne

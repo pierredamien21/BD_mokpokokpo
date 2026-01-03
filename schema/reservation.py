@@ -1,14 +1,15 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from datetime import datetime
 
-class ReservationCreate(BaseModel):
-    id_client: int
+class ReservationBase(BaseModel):
     statut: str
 
-class ReservationOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    
+class ReservationCreate(ReservationBase):
+    id_client: int
+
+class ReservationRead(ReservationBase):
     id_reservation: int
     date_reservation: datetime
-    statut: str
-    id_client: int
+
+    class Config:
+        from_attributes = True

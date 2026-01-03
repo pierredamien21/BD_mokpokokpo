@@ -1,19 +1,23 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+
 from database import get_db
 from models.model import Produit
-from schema.produit import ProduitCreate, ProduitOut
+from schema.produit import ProduitCreate, ProduitRead
 
-router = APIRouter(prefix="/produits", tags=["Produits"])
+router = APIRouter(
+    prefix="/produits",
+    tags=["Produits"]
+)
 
-@router.post("/", response_model=ProduitOut)
-def create_produit(produit: ProduitCreate, db: Session = Depends(get_db)):
-    db_produit = Produit(**produit.model_dump())
-    db.add(db_produit)
+@router.post("/", response_model=ProduitRead)
+def create_produit(data: ProduitCreate, db: Session = Depends(get_db)):
+    produit = Produit(**data.model_dump())
+    db.add(produit)
     db.commit()
-    db.refresh(db_produit)
-    return db_produit
+    db.refresh(produit)
+    return produit
 
-@router.get("/", response_model=list[ProduitOut])
+@router.get("/", response_model=list[ProduitRead])
 def get_produits(db: Session = Depends(get_db)):
     return db.query(Produit).all()

@@ -1,14 +1,17 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from decimal import Decimal
 
-class LigneCommandeCreate(BaseModel):
-    id_commande: int
-    id_produit: int
+class LigneCommandeBase(BaseModel):
     quantite: int
     prix_unitaire: Decimal
     montant_ligne: Decimal
 
-class LigneCommandeOut(LigneCommandeCreate):
-    model_config = ConfigDict(from_attributes=True)
-    
+class LigneCommandeCreate(LigneCommandeBase):
+    id_commande: int
+    id_produit: int
+
+class LigneCommandeRead(LigneCommandeBase):
     id_ligne_commande: int
+
+    class Config:
+        from_attributes = True
