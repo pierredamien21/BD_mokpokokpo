@@ -359,3 +359,116 @@ def test_ultimate_e2e_flow(client, db_session):
     assert fail_users.status_code == 403
     
     print("\n--- ULTIMATE E2E FLOW PASSED ---")
+
+# ================================
+# 7. ADDED TESTS (SALES, RESERVATIONS, ALERTS)
+# ================================
+
+def test_vente_flow(client, db_session):
+    from models.model import Utilisateur, Produit, Commande
+    from security.hashing import hash_password
+    from schema.enums import RoleEnum, StatutCommandeEnum
+    from datetime import datetime
+
+    # 1. Setup Admin & Data
+    admin = Utilisateur(nom="Admin", prenom="Vente", email="admin_vente@test.com", 
+                        mot_de_passe=hash_password("password"), role=RoleEnum.ADMIN)
+    p = Produit(nom_produit="Produit Vente", prix_unitaire=10.0)
+    db_session.add_all([admin, p])
+    db_session.commit()
+
+    login_res = client.post("/auth/login", data={"username": "admin_vente@test.com", "password": "password"})
+    admin_headers = {"Authorization": f"Bearer {login_res.json()['access_token']}"}
+
+    # 2. Setup Client & Order
+    token_c, user_id_c = signup_login_helper(client, "client_vente@test.com")
+    headers_c = {"Authorization": f"Bearer {token_c}"}
+    client.post("/clients/", json={"id_utilisateur": user_id_c, "telephone": "123"}, headers=headers_c)
+    
+    # ACCEPTEE instead of TERMINEE (which doesn't exist in StatutCommandeEnum)
+    order_res = client.post("/commandes/", json={"id_utilisateur": user_id_c, "statut": "ACCEPTEE"}, headers=headers_c)
+    assert order_res.status_code == 200
+    order_id = order_res.json()["id_commande"]
+
+    # 3. Create Vente (Admin/Gest Comm only)
+    vente_data = {"id_commande": order_id, "chiffre_affaires": 100.0}
+    res_vente = client.post("/ventes/", json=vente_data, headers=admin_headers)
+    assert res_vente.status_code == 200
+    assert res_vente.json()["id_commande"] == order_id
+
+    # 4. Duplicate Vente -> Should fail
+    res_dup = client.post("/ventes/", json=vente_data, headers=admin_headers)
+    assert res_dup.status_code == 400
+    assert "Vente déjà enregistrée" in res_dup.json()["detail"]
+
+    # 5. Unauthorized Creation
+    res_unauth = client.post("/ventes/", json=vente_data, headers=headers_c)
+    assert res_unauth.status_code == 403
+
+def test_reservation_flow(client, db_session):
+    from models.model import Client
+    # 1. Setup Client
+    token_c, user_id_c = signup_login_helper(client, "client_res@test.com")
+    headers_c = {"Authorization": f"Bearer {token_c}"}
+    
+    # Ensure profile exists for reservation
+    client_prof = Client(id_utilisateur=user_id_c, telephone="123")
+    db_session.add(client_prof)
+    db_session.commit()
+
+    # 2. Create Reservation (Client/Admin)
+    res_data = {"id_utilisateur": user_id_c, "statut": "EN_ATTENTE"}
+    res_post = client.post("/reservations/", json=res_data, headers=headers_c)
+    assert res_post.status_code == 200
+    res_json = res_post.json()
+    assert "id_reservation" in res_json
+    res_id = res_json["id_reservation"]
+
+    # 3. Get Reservation
+    res_get = client.get(f"/reservations/{res_id}", headers=headers_c)
+    assert res_get.status_code == 200
+    # Note: ReservationRead schema doesn't have id_utilisateur, but has id_reservation and statut
+    assert res_get.json()["id_reservation"] == res_id
+    assert res_get.json()["statut"] == "EN_ATTENTE"
+
+    # 4. Get All (Admin/Gest Comm only)
+    res_all = client.get("/reservations/", headers=headers_c)
+    assert res_all.status_code == 403
+
+def test_alerte_stock_crud(client, db_session):
+    from models.model import Utilisateur, Produit
+    from security.hashing import hash_password
+    from schema.enums import RoleEnum
+
+    # 1. Setup Admin & Product
+    admin = Utilisateur(nom="Admin", prenom="Alerte", email="admin_alerte@test.com", 
+                        mot_de_passe=hash_password("password"), role=RoleEnum.ADMIN)
+    p = Produit(nom_produit="Produit Alerte", prix_unitaire=5.0)
+    db_session.add_all([admin, p])
+    db_session.commit()
+    p_id = p.id_produit
+
+    login_res = client.post("/auth/login", data={"username": "admin_alerte@test.com", "password": "password"})
+    admin_headers = {"Authorization": f"Bearer {login_res.json()['access_token']}"}
+
+    # 2. Create Alerte (Admin/Gest Stock only)
+    alert_data = {
+        "id_produit": p_id,
+        "message": "Stock bas",
+        "statut": "NON_TRAITEE",
+        "seuil_declencheur": 10
+    }
+    res_alert = client.post("/alertes-stock/", json=alert_data, headers=admin_headers)
+    assert res_alert.status_code == 200
+    alert_id = res_alert.json()["id_alerte"]
+
+    # 3. Get Alerte
+    res_get = client.get(f"/alertes-stock/{alert_id}", headers=admin_headers)
+    assert res_get.status_code == 200
+    assert res_get.json()["message"] == "Stock bas"
+
+    # 4. Unauthorized Access (Client)
+    token_c, _ = signup_login_helper(client, "client_alerte@test.com")
+    headers_c = {"Authorization": f"Bearer {token_c}"}
+    res_unauth = client.get("/alertes-stock/", headers=headers_c)
+    assert res_unauth.status_code == 403
