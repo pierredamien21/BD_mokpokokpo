@@ -17,8 +17,6 @@ router = APIRouter(
 
 @router.post("/login", response_model=TokenResponse)
 @limiter.limit("5/minute")
-@router.post("/login", response_model=TokenResponse)
-@limiter.limit("5/minute")
 def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(Utilisateur).filter(
         Utilisateur.email == form_data.username
