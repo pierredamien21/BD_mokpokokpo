@@ -14,7 +14,19 @@ from routers import (
 
 Base.metadata.create_all(bind=engine)
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title="API Ferme Mokpokpo")
+
+# Configuration CORS pour permettre au frontend de communiquer avec l'API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # À restreindre en production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
