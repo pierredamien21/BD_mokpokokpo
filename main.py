@@ -1,17 +1,15 @@
 from fastapi import FastAPI
 from database import engine
 from models.model import Base
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
+from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-
-limiter = Limiter(key_func=get_remote_address)
+from security.limiter import limiter
 
 # Routers
 from routers import (
     utilisateur, client, produit, stock,
     commande, ligne_commande, reservation,
-    vente, alerte_stock, auth
+    vente, alerte_stock, auth, prediction
 )
 
 Base.metadata.create_all(bind=engine)
@@ -31,6 +29,7 @@ app.include_router(reservation.router)
 app.include_router(vente.router)
 app.include_router(alerte_stock.router)
 app.include_router(auth.router)
+app.include_router(prediction.router)
 
 @app.get("/")
 def root():

@@ -50,10 +50,12 @@ class Utilisateur(Base):
 class Client(Base):
     __tablename__ = "client"
 
+    id_client = Column(Integer, primary_key=True)
     id_utilisateur = Column(
         Integer,
         ForeignKey("utilisateur.id_utilisateur", ondelete="CASCADE"),
-        primary_key=True
+        unique=True,
+        nullable=False
     )
     telephone = Column(String(30))
     adresse = Column(Text)
@@ -118,9 +120,9 @@ class Commande(Base):
     montant_total = Column(Numeric(12, 2), default=0)
     statut = Column(String(20), nullable=False)
 
-    id_utilisateur = Column(
+    id_client = Column(
         Integer,
-        ForeignKey("client.id_utilisateur", ondelete="CASCADE"),
+        ForeignKey("client.id_client", ondelete="CASCADE"),
         nullable=False
     )
 
@@ -184,9 +186,9 @@ class Reservation(Base):
     date_reservation = Column(DateTime, server_default=func.now())
     statut = Column(String(20), nullable=False)
 
-    id_utilisateur = Column(
+    id_client = Column(
         Integer,
-        ForeignKey("client.id_utilisateur", ondelete="CASCADE"),
+        ForeignKey("client.id_client", ondelete="CASCADE"),
         nullable=False
     )
 

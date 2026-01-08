@@ -10,7 +10,7 @@ from security.access_control import RoleChecker
 from schema.enums import RoleEnum
 from schema.enums import RoleEnum
 from sqlalchemy.exc import IntegrityError
-from main import limiter
+from security.limiter import limiter
 from fastapi import Request
 
 router = APIRouter(
