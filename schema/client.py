@@ -9,6 +9,7 @@ class ClientCreate(ClientBase):
     id_utilisateur: int
 
 class ClientRead(ClientBase):
+    id_client: int
     id_utilisateur: int
 
     class Config:

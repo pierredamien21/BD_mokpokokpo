@@ -8,7 +8,7 @@ class CommandeBase(BaseModel):
     statut: StatutCommandeEnum = StatutCommandeEnum.EN_ATTENTE
 
 class CommandeCreate(CommandeBase):
-    id_utilisateur: int
+    id_client: int
 
 class CommandeRead(CommandeBase):
     id_commande: int

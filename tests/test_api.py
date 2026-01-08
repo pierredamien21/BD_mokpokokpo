@@ -108,12 +108,14 @@ def test_order_flow_and_calculation(client):
     # 2. Create Client Profile
     # First, must exist as User (already done)
     # Then create client profile
-    client_res = client.post("/clients/", json={"id_utilisateur": user_id, "telephone": "123"}, headers=headers)
+    client_res = res_c = client.post("/clients/", json={"id_utilisateur": user_id, "telephone": "123"}, headers=headers)
+    client_id = res_c.json()["id_client"]
+    client_id = client_res.json()["id_client"]
     assert client_res.status_code == 200
 
     # 3. Create Order
     order_data = {
-        "id_utilisateur": user_id,
+        "id_client": client_id,
         "statut": "EN_ATTENTE"
     }
     res_order = client.post("/commandes/", json=order_data, headers=headers)
@@ -166,9 +168,10 @@ def test_product_and_stock_logic(client, db_session):
     # Create an order first
     token_b, user_id = signup_login_helper(client, "buyer@test.com")
     headers_b = {"Authorization": f"Bearer {token_b}"}
-    client.post("/clients/", json={"id_utilisateur": user_id, "telephone": "999"}, headers=headers_b)
+    res_c = client.post("/clients/", json={"id_utilisateur": user_id, "telephone": "999"}, headers=headers_b)
+    client_id = res_c.json()["id_client"]
     
-    res_order = client.post("/commandes/", json={"id_utilisateur": user_id, "statut": "EN_ATTENTE"}, headers=headers_b)
+    res_order = client.post("/commandes/", json={"id_client": client_id, "statut": "EN_ATTENTE"}, headers=headers_b)
     order_id = res_order.json()["id_commande"]
 
     # Add line item
@@ -263,11 +266,12 @@ def test_invalid_enum_status_validation(client):
     # Create user/client
     token, user_id = signup_login_helper(client, "enum@test.com")
     headers = {"Authorization": f"Bearer {token}"}
-    client.post("/clients/", json={"id_utilisateur": user_id, "telephone": "123"}, headers=headers)
+    res_c = client.post("/clients/", json={"id_utilisateur": user_id, "telephone": "123"}, headers=headers)
+    client_id = res_c.json()["id_client"]
 
     # Try creating order with invalid status
     invalid_order = {
-        "id_utilisateur": user_id,
+        "id_client": client_id,
         "statut": "MARCHE_PAS" # Not in StatutCommandeEnum
     }
     res = client.post("/commandes/", json=invalid_order, headers=headers)
@@ -328,10 +332,13 @@ def test_ultimate_e2e_flow(client, db_session):
     c_headers = {"Authorization": f"Bearer {c_token}"}
     
     # Profile creation
-    client.post("/clients/", json={"id_utilisateur": c_user_id, "telephone": "060606"}, headers=c_headers)
+    res_c = res_c = client.post("/clients/", json={"id_utilisateur": c_user_id, "telephone": "060606"}, headers=c_headers)
+    assert res_c.status_code == 200
+    client_id = res_c.json()["id_client"]
     
     # Order creation
-    order_res = client.post("/commandes/", json={"id_utilisateur": c_user_id, "statut": "EN_ATTENTE"}, headers=c_headers)
+    order_res = client.post("/commandes/", json={"id_client": client_id, "statut": "EN_ATTENTE"}, headers=c_headers)
+    assert order_res.status_code == 200
     order_id = order_res.json()["id_commande"]
     
     # Add Item
@@ -383,10 +390,11 @@ def test_vente_flow(client, db_session):
     # 2. Setup Client & Order
     token_c, user_id_c = signup_login_helper(client, "client_vente@test.com")
     headers_c = {"Authorization": f"Bearer {token_c}"}
-    client.post("/clients/", json={"id_utilisateur": user_id_c, "telephone": "123"}, headers=headers_c)
+    res_c = client.post("/clients/", json={"id_utilisateur": user_id_c, "telephone": "123"}, headers=headers_c)
+    client_id = res_c.json()["id_client"]
     
     # ACCEPTEE instead of TERMINEE (which doesn't exist in StatutCommandeEnum)
-    order_res = client.post("/commandes/", json={"id_utilisateur": user_id_c, "statut": "ACCEPTEE"}, headers=headers_c)
+    order_res = client.post("/commandes/", json={"id_client": client_id, "statut": "ACCEPTEE"}, headers=headers_c)
     assert order_res.status_code == 200
     order_id = order_res.json()["id_commande"]
 
@@ -414,10 +422,13 @@ def test_reservation_flow(client, db_session):
     # Ensure profile exists for reservation
     client_prof = Client(id_utilisateur=user_id_c, telephone="123")
     db_session.add(client_prof)
+    db_session.flush()
+    client_id = client_prof.id_client
+    db_session.add(client_prof)
     db_session.commit()
 
     # 2. Create Reservation (Client/Admin)
-    res_data = {"id_utilisateur": user_id_c, "statut": "EN_ATTENTE"}
+    res_data = {"id_client": client_id, "statut": "EN_ATTENTE"}
     res_post = client.post("/reservations/", json=res_data, headers=headers_c)
     assert res_post.status_code == 200
     res_json = res_post.json()

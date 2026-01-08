@@ -7,7 +7,7 @@ class ReservationBase(BaseModel):
     statut: StatutReservationEnum = StatutReservationEnum.EN_ATTENTE
 
 class ReservationCreate(ReservationBase):
-    id_utilisateur: int
+    id_client: int
 
 class ReservationRead(ReservationBase):
     id_reservation: int

@@ -61,3 +61,10 @@ Thumbs.db
 *.log
 tmp/
 temp/
+.python-version
+celerybeat-schedule
+.dmypy.json
+dmypy.json
+.ipynb_checkpoints/
+*.bak
+*.tmp

@@ -7,7 +7,7 @@ from models.model import Utilisateur
 from schema.utilisateur import LoginRequest, TokenResponse
 from security.hashing import verify_password
 from security.jwt import create_access_token
-from main import limiter
+from security.limiter import limiter
 from fastapi import Request
 
 router = APIRouter(

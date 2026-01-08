@@ -20,10 +20,12 @@ def create_commande(data: CommandeCreate, db: Session = Depends(get_db), current
     # Vérification : Le client de la commande doit correspondre à l'utilisateur connecté
     # Note: data.id_utilisateur ici fait référence au client.id_utilisateur (FK table client PK utilisateur)
     if current_user.role != RoleEnum.ADMIN:
-        if data.id_utilisateur != current_user.id_utilisateur:
+        # Note: On compare l'id_utilisateur du client lié avec l'utilisateur connecté
+        client = db.get(Client, data.id_client)
+        if not client or client.id_utilisateur != current_user.id_utilisateur:
              raise HTTPException(status_code=403, detail="Vous ne pouvez pas passer une commande pour un autre client")
 
-    client = db.get(Client, data.id_utilisateur)
+    client = db.get(Client, data.id_client)
     if not client:
         raise HTTPException(status_code=404, detail="Client introuvable")
 

@@ -3,11 +3,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
 from database import get_db
-from models.model import Reservation, Client
+from models.model import Reservation, Client, Utilisateur
 from schema.reservation import ReservationCreate, ReservationRead
-
 from security.access_control import RoleChecker
 from schema.enums import RoleEnum
+from security.dependencies import get_current_user
 
 router = APIRouter(
     prefix="/reservations",
@@ -15,8 +15,14 @@ router = APIRouter(
 )
 
 @router.post("/", response_model=ReservationRead, dependencies=[Depends(RoleChecker([RoleEnum.ADMIN, RoleEnum.CLIENT]))])
-def create_reservation(data: ReservationCreate, db: Session = Depends(get_db)):
-    if not db.get(Client, data.id_utilisateur):
+def create_reservation(data: ReservationCreate, db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
+    if current_user.role != RoleEnum.ADMIN:
+        client = db.get(Client, data.id_client)
+        if not client or client.id_utilisateur != current_user.id_utilisateur:
+             raise HTTPException(status_code=403, detail="Vous ne pouvez pas effectuer une réservation pour un autre client")
+
+    client = db.get(Client, data.id_client)
+    if not client:
         raise HTTPException(status_code=404, detail="Client introuvable")
 
     reservation = Reservation(**data.model_dump())
