@@ -52,8 +52,17 @@ def create_utilisateur(
         
     return user
 
-@router.get("/", response_model=list[UtilisateurRead], dependencies=[Depends(RoleChecker([RoleEnum.ADMIN]))])
-def get_utilisateurs(db: Session = Depends(get_db)):
+@router.get("/", response_model=list[UtilisateurRead])
+def get_utilisateurs(
+    db: Session = Depends(get_db),
+    current_user: Utilisateur = Depends(get_current_user)
+):
+    # Vérifier que seul un ADMIN peut accéder
+    if current_user.role != RoleEnum.ADMIN:
+        raise HTTPException(
+            status_code=403,
+            detail="Vous n'avez pas les droits nécessaires"
+        )
     return db.query(Utilisateur).all()
 
 @router.get("/{id_utilisateur}", response_model=UtilisateurRead)
