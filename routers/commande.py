@@ -15,8 +15,10 @@ router = APIRouter(
     tags=["Commandes"]
 )
 
-@router.post("/", response_model=CommandeRead, dependencies=[Depends(RoleChecker([RoleEnum.CLIENT, RoleEnum.ADMIN]))])
+@router.post("/", response_model=CommandeRead)
 def create_commande(data: CommandeCreate, db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
+    if current_user.role not in [RoleEnum.CLIENT, RoleEnum.ADMIN]:
+        raise HTTPException(status_code=403, detail="Permissions insuffisantes")
     # Vérification : Le client de la commande doit correspondre à l'utilisateur connecté
     # Note: data.id_utilisateur ici fait référence au client.id_utilisateur (FK table client PK utilisateur)
     if current_user.role != RoleEnum.ADMIN:
@@ -35,8 +37,10 @@ def create_commande(data: CommandeCreate, db: Session = Depends(get_db), current
     db.refresh(commande)
     return commande
 
-@router.get("/", response_model=list[CommandeRead], dependencies=[Depends(RoleChecker([RoleEnum.ADMIN, RoleEnum.GEST_COMMERCIAL]))])
-def get_commandes(db: Session = Depends(get_db)):
+@router.get("/", response_model=list[CommandeRead])
+def get_commandes(db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
+    if current_user.role not in [RoleEnum.ADMIN, RoleEnum.GEST_COMMERCIAL]:
+        raise HTTPException(status_code=403, detail="Permissions insuffisantes")
     return db.query(Commande).all()
 
 @router.get("/{id_commande}", response_model=CommandeRead)
