@@ -37,6 +37,8 @@ def create_client(data: ClientCreate, db: Session = Depends(get_db), current_use
         raise HTTPException(status_code=400, detail="Ce client existe déjà ou erreur d'intégrité")
     return client
 
-@router.get("/", response_model=list[ClientRead], dependencies=[Depends(RoleChecker([RoleEnum.ADMIN, RoleEnum.GEST_COMMERCIAL]))])
-def get_clients(db: Session = Depends(get_db)):
+@router.get("/", response_model=list[ClientRead])
+def get_clients(db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
+    if current_user.role not in [RoleEnum.ADMIN, RoleEnum.GEST_COMMERCIAL]:
+        raise HTTPException(status_code=403, detail="Permissions insuffisantes")
     return db.query(Client).all()
