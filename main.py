@@ -11,7 +11,7 @@ from scheduler import start_scheduler, stop_scheduler
 from routers import (
     utilisateur, client, produit, stock,
     commande, ligne_commande, reservation,
-    vente, alerte_stock, auth, prediction, lot, alerte_expiration
+    vente, alerte_stock, auth, prediction, lot, alerte_expiration, livraison
 )
 
 Base.metadata.create_all(bind=engine)
@@ -67,6 +67,7 @@ app.include_router(reservation.router)
 app.include_router(vente.router)
 app.include_router(alerte_stock.router)
 app.include_router(alerte_expiration.router)  # 🎯 Phase 2 - Alertes intelligentes
+app.include_router(livraison.router)  # 🎯 Phase 3 - Gestion des livraisons
 app.include_router(auth.router)
 app.include_router(prediction.router)
 

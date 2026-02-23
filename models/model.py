@@ -185,6 +185,7 @@ class Commande(Base):
         cascade="all, delete-orphan"
     )
     vente = relationship("Vente", back_populates="commande", uselist=False)
+    livraison = relationship("Livraison", back_populates="commande", uselist=False)
 
 
 # =====================================================
@@ -330,3 +331,52 @@ class AlerteStock(Base):
     )
 
     produit = relationship("Produit", back_populates="alertes")
+
+
+# =====================================================
+# LIVRAISON (PHASE 3 - DELIVERY MANAGEMENT)
+# =====================================================
+class Livraison(Base):
+    __tablename__ = "livraison"
+
+    id_livraison = Column(Integer, primary_key=True, index=True)
+    numero_livraison = Column(String(50), unique=True, nullable=False)
+    statut = Column(String(30), nullable=False, default="EN_PREPARATION")
+    date_creation = Column(DateTime, server_default=func.now(), index=True)
+    date_preparation = Column(DateTime, nullable=True)
+    date_expedition = Column(DateTime, nullable=True)
+    date_livraison = Column(DateTime, nullable=True)
+    notes = Column(Text, nullable=True)
+    adresse_livraison = Column(Text, nullable=True)
+    transporteur = Column(String(100), nullable=True)
+    numero_suivi = Column(String(100), nullable=True, unique=True)
+
+    # Clés étrangères
+    id_commande = Column(
+        Integer,
+        ForeignKey("commande.id_commande", ondelete="CASCADE"),
+        nullable=False,
+        unique=True
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "statut IN ('EN_PREPARATION', 'PRETE', 'EN_LIVRAISON', 'LIVRÉE')",
+            name="ck_livraison_statut"
+        ),
+        CheckConstraint(
+            "date_preparation IS NULL OR date_preparation >= date_creation",
+            name="ck_livraison_preparation_date"
+        ),
+        CheckConstraint(
+            "date_expedition IS NULL OR date_expedition >= COALESCE(date_preparation, date_creation)",
+            name="ck_livraison_expedition_date"
+        ),
+        CheckConstraint(
+            "date_livraison IS NULL OR date_livraison >= COALESCE(date_expedition, date_creation)",
+            name="ck_livraison_delivery_date"
+        ),
+    )
+
+    # Relations
+    commande = relationship("Commande", back_populates="livraison")
