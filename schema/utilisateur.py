@@ -15,6 +15,7 @@ class UtilisateurCreate(UtilisateurBase):
 class UtilisateurRead(UtilisateurBase):
     id_utilisateur: int
     date_creation: datetime
+    actif: bool = True
 
     class Config:
         from_attributes = True

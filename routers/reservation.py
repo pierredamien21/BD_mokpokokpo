@@ -45,3 +45,26 @@ def get_reservation(id_reservation: int, db: Session = Depends(get_db)):
     if not reservation:
         raise HTTPException(status_code=404, detail="Réservation introuvable")
     return reservation
+
+@router.delete("/{id_reservation}")
+def delete_reservation(id_reservation: int, db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
+    if current_user.role not in [RoleEnum.ADMIN, RoleEnum.GEST_COMMERCIAL]:
+        raise HTTPException(status_code=403, detail="Permissions insuffisantes")
+    reservation = db.get(Reservation, id_reservation)
+    if not reservation:
+        raise HTTPException(status_code=404, detail="Réservation introuvable")
+    
+    # Garde-fou: Bloquer si réservation acceptée
+    if reservation.statut == "ACCEPTEE":
+        raise HTTPException(
+            status_code=400,
+            detail="Impossible de supprimer une réservation acceptée"
+        )
+    
+    try:
+        db.delete(reservation)
+        db.commit()
+        return {"message": "Réservation supprimée avec succès"}
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Impossible de supprimer la réservation (contraintes de base de données)")

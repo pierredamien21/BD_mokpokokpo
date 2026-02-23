@@ -9,7 +9,7 @@ from security.limiter import limiter
 from routers import (
     utilisateur, client, produit, stock,
     commande, ligne_commande, reservation,
-    vente, alerte_stock, auth, prediction
+    vente, alerte_stock, auth, prediction, lot
 )
 
 Base.metadata.create_all(bind=engine)
@@ -35,6 +35,7 @@ app.include_router(utilisateur.router)
 app.include_router(client.router)
 app.include_router(produit.router)
 app.include_router(stock.router)
+app.include_router(lot.router)  # 🎯 FEFO - Gestion des lots
 app.include_router(commande.router)
 app.include_router(ligne_commande.router)
 app.include_router(reservation.router)

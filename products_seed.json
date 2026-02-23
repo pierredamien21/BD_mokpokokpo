@@ -1,0 +1,184 @@
+{
+  "produits": [
+    {
+      "nom_produit": "Basilic Frais Aromatique",
+      "type_produit": "Aromatique",
+      "description": "Basilic frais cultivé biologiquement, parfum intense",
+      "usages": "Cuisine méditerranéenne, tisanes, huile infusée",
+      "prix_unitaire": 8.50,
+      "url_image": "https://images.unsplash.com/photo-1618375569909-3c8616cf7733?w=400",
+      "stock": {
+        "quantite_disponible": 500,
+        "seuil_minimal": 150
+      }
+    },
+    {
+      "nom_produit": "Menthe Poivrée Séchée",
+      "type_produit": "Aromatique & Médicinale",
+      "description": "Menthe poivrée premium séchée",
+      "usages": "Tisanes digestives, cuisines, massage",
+      "prix_unitaire": 12.00,
+      "url_image": "https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?w=400",
+      "stock": {
+        "quantite_disponible": 800,
+        "seuil_minimal": 200
+      }
+    },
+    {
+      "nom_produit": "Camomille Allemande Bio",
+      "type_produit": "Médicinale",
+      "description": "Camomille séchée bio pour tisanes apaisantes",
+      "usages": "Tisanes relaxantes, sommeil, digestion",
+      "prix_unitaire": 14.50,
+      "url_image": "https://images.unsplash.com/photo-1563090391-5e8c87c67fcb?w=400",
+      "stock": {
+        "quantite_disponible": 350,
+        "seuil_minimal": 100
+      }
+    },
+    {
+      "nom_produit": "Thym Séché Premium",
+      "type_produit": "Aromatique & Médicinale",
+      "description": "Thym montagnard déshydraté, saveur concentrée",
+      "usages": "Cuisine, tisanes respiratoires, marinades",
+      "prix_unitaire": 10.75,
+      "url_image": "https://images.unsplash.com/photo-1592417817038-d13e4eb18238?w=400",
+      "stock": {
+        "quantite_disponible": 600,
+        "seuil_minimal": 180
+      }
+    },
+    {
+      "nom_produit": "Echinacea Purpurea Poudre",
+      "type_produit": "Médicinale",
+      "description": "Échinacée pourpre en poudre, défense immunitaire",
+      "usages": "Tisanes immunité, suppléments naturels",
+      "prix_unitaire": 18.00,
+      "url_image": "https://images.unsplash.com/photo-1597868165564-02189e18fe05?w=400",
+      "stock": {
+        "quantite_disponible": 200,
+        "seuil_minimal": 80
+      }
+    },
+    {
+      "nom_produit": "Gingembre Racine Séchée",
+      "type_produit": "Médicinale",
+      "description": "Gingembre de qualité supérieure séché",
+      "usages": "Tisanes anti-nausée, digestion, inflammations",
+      "prix_unitaire": 16.50,
+      "url_image": "https://images.unsplash.com/photo-1599090892176-3aa6e3cf1f96?w=400",
+      "stock": {
+        "quantite_disponible": 400,
+        "seuil_minimal": 120
+      }
+    },
+    {
+      "nom_produit": "Romarin Sauvage",
+      "type_produit": "Aromatique & Médicinale",
+      "description": "Romarin sauvage cultivé en montagne",
+      "usages": "Cuisine, tisanes mémoire, massages, marinade",
+      "prix_unitaire": 9.99,
+      "url_image": "https://images.unsplash.com/photo-1595907381309-b53a4f91c72e?w=400",
+      "stock": {
+        "quantite_disponible": 700,
+        "seuil_minimal": 200
+      }
+    },
+    {
+      "nom_produit": "Lavande Vraie Provence",
+      "type_produit": "Aromatique & Médicinale",
+      "description": "Lavande biologique de Provence, très parfumée",
+      "usages": "Cuisines sucrées, tisanes, aromathérapie, sachets",
+      "prix_unitaire": 13.50,
+      "url_image": "https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=400",
+      "stock": {
+        "quantite_disponible": 450,
+        "seuil_minimal": 150
+      }
+    },
+    {
+      "nom_produit": "Curcuma Racine Poudre Bio",
+      "type_produit": "Médicinale",
+      "description": "Curcuma bio en poudre, anti-inflammatoire naturel",
+      "usages": "Tisanes, cuisine indienne, suppléments",
+      "prix_unitaire": 19.99,
+      "url_image": "https://images.unsplash.com/photo-1615485500834-bc10199bc006?w=400",
+      "stock": {
+        "quantite_disponible": 280,
+        "seuil_minimal": 100
+      }
+    },
+    {
+      "nom_produit": "Sauge Officinale Séchée",
+      "type_produit": "Aromatique & Médicinale",
+      "description": "Sauge officinale de jardin biologique",
+      "usages": "Tisanes gorge, cuisine, rinçages buccaux",
+      "prix_unitaire": 11.25,
+      "url_image": "https://images.unsplash.com/photo-1594759455266-3495e4c8e0d9?w=400",
+      "stock": {
+        "quantite_disponible": 520,
+        "seuil_minimal": 140
+      }
+    },
+    {
+      "nom_produit": "Origan Séché Grec",
+      "type_produit": "Aromatique",
+      "description": "Origan grec de montagne, saveur authentique",
+      "usages": "Cuisine méditerranéenne, pizzas, sauces",
+      "prix_unitaire": 8.75,
+      "url_image": "https://images.unsplash.com/photo-1607521211526-dd87423f4299?w=400",
+      "stock": {
+        "quantite_disponible": 650,
+        "seuil_minimal": 200
+      }
+    },
+    {
+      "nom_produit": "Mélisse Citronnée Bio",
+      "type_produit": "Aromatique & Médicinale",
+      "description": "Mélisse avec arôme citron naturel, calmante",
+      "usages": "Tisanes relaxantes, cuisine, aromathérapie",
+      "prix_unitaire": 13.99,
+      "url_image": "https://images.unsplash.com/photo-1544776193-352d25ca82cd?w=400",
+      "stock": {
+        "quantite_disponible": 380,
+        "seuil_minimal": 110
+      }
+    },
+    {
+      "nom_produit": "Genièvre Baies Séchées",
+      "type_produit": "Aromatique & Médicinale",
+      "description": "Baies de genièvre authentiques du jura",
+      "usages": "Cuisine épicée, tisanes détox, marinades",
+      "prix_unitaire": 15.50,
+      "url_image": "https://images.unsplash.com/photo-1506812574058-fc75fa93fead?w=400",
+      "stock": {
+        "quantite_disponible": 220,
+        "seuil_minimal": 90
+      }
+    },
+    {
+      "nom_produit": "Miel Aromatisé Lavande",
+      "type_produit": "Produit Dérivé",
+      "description": "Miel infusé aux fleurs de lavande",
+      "usages": "Édulcorant miel, tisanes, tartines, cosmétique",
+      "prix_unitaire": 22.00,
+      "url_image": "https://images.unsplash.com/photo-1587049352846-4a222e784422?w=400",
+      "stock": {
+        "quantite_disponible": 150,
+        "seuil_minimal": 50
+      }
+    },
+    {
+      "nom_produit": "Huile Essentielle Menthe",
+      "type_produit": "Produit Transformé",
+      "description": "Huile essentielle pure 100% menthe poivrée",
+      "usages": "Aromathérapie, diffusion, cosmétiques",
+      "prix_unitaire": 24.99,
+      "url_image": "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=400",
+      "stock": {
+        "quantite_disponible": 80,
+        "seuil_minimal": 30
+      }
+    }
+  ]
+}

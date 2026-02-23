@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from datetime import datetime
 
 from database import get_db
 from models.model import Vente, Commande, Utilisateur
@@ -37,7 +38,8 @@ def create_vente(data: VenteCreate, db: Session = Depends(get_db), current_user:
 def get_ventes(db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
     if current_user.role not in [RoleEnum.ADMIN, RoleEnum.GEST_COMMERCIAL]:
         raise HTTPException(status_code=403, detail="Permissions insuffisantes")
-    return db.query(Vente).all()
+    # Filtrer uniquement les ventes non supprimées
+    return db.query(Vente).filter(Vente.deleted_at == None).all()
 
 @router.get("/{id_vente}", response_model=VenteRead)
 def get_vente(id_vente: int, db: Session = Depends(get_db)):
@@ -45,3 +47,20 @@ def get_vente(id_vente: int, db: Session = Depends(get_db)):
     if not vente:
         raise HTTPException(status_code=404, detail="Vente non trouvée")
     return vente
+
+@router.delete("/{id_vente}")
+def delete_vente(id_vente: int, db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
+    if current_user.role != RoleEnum.ADMIN:
+        raise HTTPException(status_code=403, detail="Seul l'admin peut archiver une vente")
+    
+    vente = db.get(Vente, id_vente)
+    if not vente:
+        raise HTTPException(status_code=404, detail="Vente non trouvée")
+    
+    if vente.deleted_at:
+        raise HTTPException(status_code=400, detail="Vente déjà archivée")
+    
+    # Soft delete: archivage au lieu de suppression physique
+    vente.deleted_at = datetime.now()
+    db.commit()
+    return {"message": "Vente archivée avec succès (conservation pour audit comptable)"}

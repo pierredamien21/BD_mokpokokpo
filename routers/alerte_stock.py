@@ -44,3 +44,18 @@ def get_alerte(id_alerte: int, db: Session = Depends(get_db)):
     if not alerte:
         raise HTTPException(status_code=404, detail="Alerte non trouvée")
     return alerte
+
+@router.delete("/{id_alerte}")
+def delete_alerte(id_alerte: int, db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
+    if current_user.role not in [RoleEnum.ADMIN, RoleEnum.GEST_STOCK]:
+        raise HTTPException(status_code=403, detail="Permissions insuffisantes")
+    alerte = db.get(AlerteStock, id_alerte)
+    if not alerte:
+        raise HTTPException(status_code=404, detail="Alerte non trouvée")
+    try:
+        db.delete(alerte)
+        db.commit()
+        return {"message": "Alerte supprimée avec succès"}
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Impossible de supprimer l'alerte")

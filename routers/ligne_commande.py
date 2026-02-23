@@ -47,3 +47,18 @@ def get_ligne_commande(id_ligne: int, db: Session = Depends(get_db)):
     if not ligne:
         raise HTTPException(status_code=404, detail="Ligne de commande introuvable")
     return ligne
+
+@router.delete("/{id_ligne}")
+def delete_ligne_commande(id_ligne: int, db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
+    if current_user.role not in [RoleEnum.ADMIN, RoleEnum.CLIENT]:
+        raise HTTPException(status_code=403, detail="Permissions insuffisantes")
+    ligne = db.get(LigneCommande, id_ligne)
+    if not ligne:
+        raise HTTPException(status_code=404, detail="Ligne de commande introuvable")
+    try:
+        db.delete(ligne)
+        db.commit()
+        return {"message": "Ligne de commande supprimée avec succès"}
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Impossible de supprimer la ligne de commande")
