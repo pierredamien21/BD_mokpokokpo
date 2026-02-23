@@ -4,7 +4,7 @@ Endpoints pour créer, consulter, et tracker les livraisons
 """
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
 from sqlalchemy import desc
@@ -380,10 +380,11 @@ def download_bon_livraison(
     
     try:
         pdf_buffer = PDFService.generate_bon_livraison(id_livraison)
-        return FileResponse(
+        filename = f"bon-livraison-{livraison.numero_livraison}.pdf"
+        return StreamingResponse(
             pdf_buffer,
             media_type="application/pdf",
-            filename=f"bon-livraison-{livraison.numero_livraison}.pdf"
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur génération PDF: {str(e)}")
