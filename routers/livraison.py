@@ -4,6 +4,7 @@ Endpoints pour créer, consulter, et tracker les livraisons
 """
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
 from sqlalchemy import desc
@@ -16,6 +17,7 @@ from schema.livraison import (
 )
 from schema.enums import RoleEnum, StatutCommandeEnum
 from security.dependencies import get_current_user
+from services.pdf_service import PDFService
 
 router = APIRouter(
     prefix="/livraisons",
@@ -344,3 +346,44 @@ def get_livraisons_dashboard(
         "livraisons_potentiellement_retardees": len(livraisons_longues),
         "alerte_critique": len(livraisons_longues) > 0
     }
+
+
+@router.get("/{id_livraison}/bon-livraison-pdf")
+def download_bon_livraison(
+    id_livraison: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Télécharger le bon de livraison en PDF
+    
+    **Permissions**: ADMIN, GEST_COMMERCIAL (et CLIENT sa propre livraison)
+    
+    Génère un PDF professionnel avec:
+    - Informations de livraison et commande
+    - Adresse et transporteur
+    - Liste des produits
+    - État et dates d'avancement
+    """
+    if current_user.role not in [RoleEnum.ADMIN, RoleEnum.GEST_COMMERCIAL, RoleEnum.CLIENT]:
+        raise HTTPException(status_code=403, detail="Permissions insuffisantes")
+    
+    livraison = db.query(Livraison).filter(Livraison.id_livraison == id_livraison).first()
+    if not livraison:
+        raise HTTPException(status_code=404, detail="Livraison introuvable")
+    
+    # Vérification: CLIENT ne peut accéder qu'à ses propres livraisons
+    if current_user.role == RoleEnum.CLIENT:
+        commande = livraison.commande
+        if commande.id_client != current_user.id_utilisateur:
+            raise HTTPException(status_code=403, detail="Vous n'avez pas accès à cette livraison")
+    
+    try:
+        pdf_buffer = PDFService.generate_bon_livraison(id_livraison)
+        return FileResponse(
+            pdf_buffer,
+            media_type="application/pdf",
+            filename=f"bon-livraison-{livraison.numero_livraison}.pdf"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur génération PDF: {str(e)}")

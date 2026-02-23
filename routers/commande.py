@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from decimal import Decimal
@@ -9,6 +10,7 @@ from schema.commande import CommandeCreate, CommandeRead
 from schema.enums import RoleEnum, StatutCommandeEnum
 from security.dependencies import get_current_user
 from services.fefo_service import FEFOService
+from services.pdf_service import PDFService
 
 router = APIRouter(
     prefix="/commandes",
@@ -230,3 +232,43 @@ def delete_commande(
             status_code=400,
             detail="Impossible de supprimer la commande (contraintes de base de données)"
         )
+
+
+@router.get("/{id_commande}/bon-pdf")
+def download_bon_commande(
+    id_commande: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """
+    Télécharger le bon de commande en PDF
+    
+    **Permissions**: CLIENT (sa propre commande), ADMIN, GEST_COMMERCIAL
+    
+    Génère un PDF professionnel avec:
+    - Informations de commande
+    - Détails client
+    - Liste des articles
+    - Montant total
+    """
+    if current_user.role not in [RoleEnum.CLIENT, RoleEnum.ADMIN, RoleEnum.GEST_COMMERCIAL]:
+        raise HTTPException(status_code=403, detail="Permissions insuffisantes")
+    
+    commande = db.get(Commande, id_commande)
+    if not commande:
+        raise HTTPException(status_code=404, detail="Commande introuvable")
+    
+    # Vérification: CLIENT ne peut accéder qu'à ses propres commandes
+    if current_user.role == RoleEnum.CLIENT:
+        if commande.id_client != current_user.id_utilisateur:
+            raise HTTPException(status_code=403, detail="Vous n'avez pas accès à cette commande")
+    
+    try:
+        pdf_buffer = PDFService.generate_bon_commande(id_commande)
+        return FileResponse(
+            pdf_buffer,
+            media_type="application/pdf",
+            filename=f"bon-commande-{id_commande:06d}.pdf"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur génération PDF: {str(e)}")
