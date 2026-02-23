@@ -38,3 +38,26 @@ def get_produit(id_produit: int, db: Session = Depends(get_db)):
     if not produit:
         raise HTTPException(status_code=404, detail="Produit non trouvé")
     return produit
+
+@router.delete("/{id_produit}")
+def delete_produit(id_produit: int, db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
+    if current_user.role not in [RoleEnum.ADMIN, RoleEnum.GEST_STOCK]:
+        raise HTTPException(status_code=403, detail="Permissions insuffisantes")
+    produit = db.get(Produit, id_produit)
+    if not produit:
+        raise HTTPException(status_code=404, detail="Produit non trouvé")
+    
+    # Vérifier si le produit a des lignes de commandes associées
+    if produit.lignes_commande:
+        raise HTTPException(
+            status_code=400, 
+            detail="Impossible de supprimer ce produit: des commandes l'utilisent déjà"
+        )
+    
+    try:
+        db.delete(produit)
+        db.commit()
+        return {"message": "Produit supprimé avec succès"}
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Impossible de supprimer le produit (contraintes de base de données)")

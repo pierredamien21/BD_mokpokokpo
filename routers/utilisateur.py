@@ -63,7 +63,8 @@ def get_utilisateurs(
             status_code=403,
             detail="Vous n'avez pas les droits nécessaires"
         )
-    return db.query(Utilisateur).all()
+    # Filtrer uniquement les utilisateurs actifs
+    return db.query(Utilisateur).filter(Utilisateur.actif == True).all()
 
 @router.get("/{id_utilisateur}", response_model=UtilisateurRead)
 def get_utilisateur(id_utilisateur: int, db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
@@ -78,3 +79,20 @@ def get_utilisateur(id_utilisateur: int, db: Session = Depends(get_db), current_
     if not user:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
     return user
+
+@router.delete("/{id_utilisateur}")
+def delete_utilisateur(id_utilisateur: int, db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
+    if current_user.role != RoleEnum.ADMIN:
+        raise HTTPException(status_code=403, detail="Permissions insuffisantes")
+    
+    user = db.get(Utilisateur, id_utilisateur)
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    if not user.actif:
+        raise HTTPException(status_code=400, detail="Utilisateur déjà désactivé")
+    
+    # Soft delete: désactivation au lieu de suppression physique
+    user.actif = False
+    db.commit()
+    return {"message": "Utilisateur désactivé avec succès"}

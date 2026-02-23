@@ -11,6 +11,7 @@ class ClientCreate(ClientBase):
 class ClientRead(ClientBase):
     id_client: int
     id_utilisateur: int
+    actif: bool = True
 
     class Config:
         from_attributes = True

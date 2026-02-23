@@ -5,6 +5,7 @@ from sqlalchemy import (
     Text,
     Numeric,
     DateTime,
+    Boolean,
     ForeignKey,
     CheckConstraint,
     UniqueConstraint
@@ -27,6 +28,7 @@ class Utilisateur(Base):
     mot_de_passe = Column(Text, nullable=False)
     role = Column(String(30), nullable=False)
     date_creation = Column(DateTime, server_default=func.now())
+    actif = Column(Boolean, default=True, nullable=False)
 
     __table_args__ = (
         CheckConstraint(
@@ -59,6 +61,7 @@ class Client(Base):
     )
     telephone = Column(String(30))
     adresse = Column(Text)
+    actif = Column(Boolean, default=True, nullable=False)
 
     utilisateur = relationship("Utilisateur", back_populates="client")
 
@@ -78,8 +81,10 @@ class Produit(Base):
     description = Column(Text)
     usages = Column(Text)
     prix_unitaire = Column(Numeric(10, 2), nullable=False)
+    url_image = Column(Text)  # URL de l'image du produit
 
     stock = relationship("Stock", back_populates="produit", uselist=False)
+    lots = relationship("Lot", back_populates="produit", cascade="all, delete-orphan")
     lignes_commande = relationship("LigneCommande", back_populates="produit")
     lignes_reservation = relationship("LigneReservation", back_populates="produit")
     alertes = relationship("AlerteStock", back_populates="produit")
@@ -107,6 +112,46 @@ class Stock(Base):
     )
 
     produit = relationship("Produit", back_populates="stock")
+    lots = relationship("Lot", back_populates="stock", cascade="all, delete-orphan")
+
+
+# =====================================================
+# LOT (BATCH TRACKING - FEFO)
+# =====================================================
+class Lot(Base):
+    __tablename__ = "lot"
+
+    id_lot = Column(Integer, primary_key=True)
+    numero_lot = Column(String(50), nullable=False)
+    date_fabrication = Column(DateTime, nullable=False)
+    date_expiration = Column(DateTime, nullable=False)
+    quantite_initiale = Column(Integer, nullable=False)
+    quantite_restante = Column(Integer, nullable=False)
+    fournisseur = Column(String(150), nullable=True)
+    date_creation = Column(DateTime, server_default=func.now())
+    
+    id_produit = Column(
+        Integer,
+        ForeignKey("produit.id_produit", ondelete="CASCADE"),
+        nullable=False
+    )
+    id_stock = Column(
+        Integer,
+        ForeignKey("stock.id_stock", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "numero_lot",
+            "id_produit",
+            name="uq_lot_numero_produit"
+        ),
+    )
+
+    produit = relationship("Produit", back_populates="lots")
+    stock = relationship("Stock", back_populates="lots")
+    lignes_commande = relationship("LigneCommande", back_populates="lot", cascade="all, delete-orphan")
 
 
 # =====================================================
@@ -163,6 +208,11 @@ class LigneCommande(Base):
         ForeignKey("produit.id_produit"),
         nullable=False
     )
+    id_lot = Column(
+        Integer,
+        ForeignKey("lot.id_lot"),
+        nullable=True
+    )
 
     __table_args__ = (
         UniqueConstraint(
@@ -174,6 +224,7 @@ class LigneCommande(Base):
 
     commande = relationship("Commande", back_populates="lignes")
     produit = relationship("Produit", back_populates="lignes_commande")
+    lot = relationship("Lot", back_populates="lignes_commande")
 
 
 # =====================================================
@@ -248,6 +299,7 @@ class Vente(Base):
     id_vente = Column(Integer, primary_key=True)
     date_vente = Column(DateTime, server_default=func.now())
     chiffre_affaires = Column(Numeric(12, 2), nullable=False)
+    deleted_at = Column(DateTime, nullable=True)
 
     id_commande = Column(
         Integer,

@@ -8,6 +8,7 @@ class ProduitBase(BaseModel):
     description: Optional[str] = None
     usages: Optional[str] = None
     prix_unitaire: Decimal
+    url_image: Optional[str] = None  # URL de l'image du produit
 
 class ProduitCreate(ProduitBase):
     pass

@@ -37,8 +37,39 @@ def create_client(data: ClientCreate, db: Session = Depends(get_db), current_use
         raise HTTPException(status_code=400, detail="Ce client existe déjà ou erreur d'intégrité")
     return client
 
+@router.get("/{id_client}", response_model=ClientRead)
+def get_client(id_client: int, db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
+    client = db.get(Client, id_client)
+    if not client:
+        raise HTTPException(status_code=404, detail="Client non trouvé")
+    
+    # Vérifier les permissions (Admin ou propriétaire)
+    if current_user.role not in [RoleEnum.ADMIN, RoleEnum.GEST_COMMERCIAL]:
+        if client.id_utilisateur != current_user.id_utilisateur:
+            raise HTTPException(status_code=403, detail="Permissions insuffisantes")
+    
+    return client
+
+@router.delete("/{id_client}")
+def delete_client(id_client: int, db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
+    if current_user.role not in [RoleEnum.ADMIN, RoleEnum.GEST_COMMERCIAL]:
+        raise HTTPException(status_code=403, detail="Permissions insuffisantes")
+    
+    client = db.get(Client, id_client)
+    if not client:
+        raise HTTPException(status_code=404, detail="Client non trouvé")
+    
+    if not client.actif:
+        raise HTTPException(status_code=400, detail="Client déjà désactivé")
+    
+    # Soft delete: désactivation au lieu de suppression physique
+    client.actif = False
+    db.commit()
+    return {"message": "Client désactivé avec succès"}
+
 @router.get("/", response_model=list[ClientRead])
 def get_clients(db: Session = Depends(get_db), current_user: Utilisateur = Depends(get_current_user)):
     if current_user.role not in [RoleEnum.ADMIN, RoleEnum.GEST_COMMERCIAL]:
         raise HTTPException(status_code=403, detail="Permissions insuffisantes")
-    return db.query(Client).all()
+    # Filtrer uniquement les clients actifs
+    return db.query(Client).filter(Client.actif == True).all()
