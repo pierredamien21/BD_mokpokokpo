@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from decimal import Decimal
@@ -265,10 +265,11 @@ def download_bon_commande(
     
     try:
         pdf_buffer = PDFService.generate_bon_commande(id_commande)
-        return FileResponse(
+        filename = f"bon-commande-{id_commande:06d}.pdf"
+        return StreamingResponse(
             pdf_buffer,
             media_type="application/pdf",
-            filename=f"bon-commande-{id_commande:06d}.pdf"
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur génération PDF: {str(e)}")

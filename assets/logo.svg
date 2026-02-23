@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F6F3E9"/>
+      <stop offset="1" stop-color="#EFE6D1"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="64" fill="url(#sky)"/>
+  <circle cx="392" cy="128" r="56" fill="#F2C94C"/>
+  <path d="M64 352 C160 280, 256 280, 448 352 L448 448 L64 448 Z" fill="#2C5F2D"/>
+  <path d="M64 352 C160 300, 256 300, 448 352" fill="none" stroke="#6DBE4B" stroke-width="10"/>
+  <path d="M104 352 C176 320, 240 320, 312 352" fill="none" stroke="#7ACB5C" stroke-width="8"/>
+  <g fill="#1F4D2E">
+    <rect x="120" y="248" width="14" height="70" rx="6"/>
+    <path d="M127 248 C110 236, 98 220, 96 202 C118 206, 134 222, 142 244"/>
+    <path d="M127 248 C144 236, 156 220, 158 202 C136 206, 120 222, 112 244"/>
+  </g>
+  <g fill="#1F4D2E">
+    <rect x="182" y="240" width="14" height="78" rx="6"/>
+    <path d="M189 240 C170 226, 156 208, 154 188 C178 192, 196 210, 204 234"/>
+    <path d="M189 240 C208 226, 222 208, 224 188 C200 192, 182 210, 174 234"/>
+  </g>
+  <g fill="#1F4D2E">
+    <rect x="244" y="252" width="14" height="66" rx="6"/>
+    <path d="M251 252 C232 240, 218 224, 216 206 C240 210, 258 226, 266 246"/>
+    <path d="M251 252 C270 240, 284 224, 286 206 C262 210, 244 226, 236 246"/>
+  </g>
+  <text x="256" y="420" font-family="Helvetica, Arial, sans-serif" font-size="32" text-anchor="middle" fill="#FFFFFF" letter-spacing="2">MOKPOKPO</text>
+</svg>
