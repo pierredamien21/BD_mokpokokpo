@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 from typing import Optional
 from decimal import Decimal
@@ -36,9 +36,7 @@ class LotRead(LotBase):
     """Schéma pour afficher un lot"""
     id_lot: int
     date_creation: datetime
-    
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class LotDetailRead(LotRead):
@@ -46,9 +44,7 @@ class LotDetailRead(LotRead):
     jours_avant_expiration: Optional[int] = Field(None, description="Jours avant expiration (peut être négatif si expiré)")
     statut_alerte: Optional[str] = Field(None, description="VERT ✅, JAUNE ⚠️, ORANGE 🟠, ROUGE 🔴, EXPIRÉ ❌")
     disponible: bool = Field(True, description="True si quantité_restante > 0 et non expiré")
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class LotListResponse(BaseModel):
@@ -67,6 +63,4 @@ class LotFEFOInfo(BaseModel):
     date_expiration: datetime
     jours_avant_expiration: int
     sera_utilise: bool = False  # True si ce lot sera utilisé pour la commande
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

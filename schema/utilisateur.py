@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 from datetime import datetime
 from typing import Optional
 from schema.enums import RoleEnum
@@ -16,9 +16,7 @@ class UtilisateurRead(UtilisateurBase):
     id_utilisateur: int
     date_creation: datetime
     actif: bool = True
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 

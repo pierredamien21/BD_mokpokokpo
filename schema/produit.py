@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from decimal import Decimal
 from typing import Optional
 
@@ -15,6 +15,4 @@ class ProduitCreate(ProduitBase):
 
 class ProduitRead(ProduitBase):
     id_produit: int
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

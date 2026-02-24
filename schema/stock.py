@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 class StockBase(BaseModel):
@@ -11,6 +11,4 @@ class StockCreate(StockBase):
 class StockRead(StockBase):
     id_stock: int
     date_derniere_mise_a_jour: datetime
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

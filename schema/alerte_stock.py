@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 from schema.enums import StatutAlerteEnum
@@ -12,6 +12,4 @@ class AlerteStockCreate(BaseModel):
 class AlerteStockRead(AlerteStockCreate):
     id_alerte: int
     date_alerte: datetime
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
