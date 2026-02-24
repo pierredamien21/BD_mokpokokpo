@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 from schema.enums import StatutReservationEnum
@@ -12,6 +12,4 @@ class ReservationCreate(ReservationBase):
 class ReservationRead(ReservationBase):
     id_reservation: int
     date_reservation: datetime
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

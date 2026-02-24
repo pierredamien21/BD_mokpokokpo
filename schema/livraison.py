@@ -2,7 +2,7 @@
 Schémas Pydantic pour Livraison (Delivery Management)
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 from typing import Optional
 
@@ -38,9 +38,7 @@ class LivraisonRead(LivraisonBase):
     date_preparation: Optional[datetime]
     date_expedition: Optional[datetime]
     date_livraison: Optional[datetime]
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class LivraisonDetailRead(LivraisonRead):
@@ -49,9 +47,7 @@ class LivraisonDetailRead(LivraisonRead):
     jours_expedition: Optional[int] = Field(None, description="Jours en transit")
     jours_total: Optional[int] = Field(None, description="Jours totaux")
     statut_visuel: str = Field(..., description="🟡 EN_PREPARATION, 🟠 PRETE, 🟢 EN_LIVRAISON, ✅ LIVRÉE")
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class LivraisonListResponse(BaseModel):

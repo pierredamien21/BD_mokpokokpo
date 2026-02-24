@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional
@@ -11,6 +11,4 @@ class VenteRead(VenteCreate):
     id_vente: int
     date_vente: datetime
     deleted_at: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from decimal import Decimal
 
 class LigneCommandeBase(BaseModel):
@@ -12,6 +12,4 @@ class LigneCommandeCreate(LigneCommandeBase):
 
 class LigneCommandeRead(LigneCommandeBase):
     id_ligne_commande: int
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
