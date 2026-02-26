@@ -190,10 +190,10 @@ class PredictionService:
         # Étape 1: Prédictions ML
         ml_predictions = self.predict_sales_by_product()
         
-        if "error" in ml_predictions:
+        if isinstance(ml_predictions, dict) and "error" in ml_predictions:
             return ml_predictions
         
-        if not ml_predictions:
+        if not ml_predictions or isinstance(ml_predictions, dict):
             return {"message": "Pas assez de données pour effectuer une prédiction"}
         
         # Étape 2: Calculs de synthèse
