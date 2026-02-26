@@ -78,7 +78,7 @@ class PredictionService:
         product_type_enc = hash(produit.type_produit or "unknown") % 100
         
         # Commandes acceptées pour ce produit
-        commandes_prod = self.db.query(func.count(LigneCommande.id_ligne)).join(
+        commandes_prod = self.db.query(func.count(LigneCommande.id_ligne_commande)).join(
             Commande, Commande.id_commande == LigneCommande.id_commande
         ).filter(
             LigneCommande.id_produit == product_id,
@@ -86,7 +86,7 @@ class PredictionService:
         ).scalar() or 0
         
         # Réservations
-        reservations = self.db.query(func.count(LigneCommande.id_ligne)).filter(
+        reservations = self.db.query(func.count(LigneCommande.id_ligne_commande)).filter(
             LigneCommande.id_produit == product_id
         ).scalar() or 0
         
