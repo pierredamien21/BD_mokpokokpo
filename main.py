@@ -80,6 +80,11 @@ app.include_router(auth.router)
 app.include_router(prediction.router)
 
 @app.get("/")
+def root():
+    return {
+        "message": "API Mokpokpo opérationnelle",
+        "docs": "/docs"
+    }
 
 @app.get("/health")
 def health_check():
@@ -118,8 +123,3 @@ def health_check():
         health_status["status"] = "degraded"
     
     return health_status
-def root():
-    return {
-        "message": "API Mokpokpo opérationnelle",
-        "docs": "/docs"
-    }
