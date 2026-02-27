@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+import os
+from datetime import datetime
 from database import engine
 from models.model import Base
 from slowapi import _rate_limit_exceeded_handler
@@ -13,6 +15,12 @@ from routers import (
     commande, ligne_commande, reservation,
     vente, alerte_stock, auth, prediction, lot, alerte_expiration, livraison
 )
+from services.prediction_service import MODELE_ML
+from database import engine
+import sqlalchemy
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 Base.metadata.create_all(bind=engine)
 
@@ -72,6 +80,44 @@ app.include_router(auth.router)
 app.include_router(prediction.router)
 
 @app.get("/")
+
+@app.get("/health")
+def health_check():
+    """
+    Endpoint pour vérifier l'état de santé du backend.
+    Vérifie: DB, modèle ML, configuration Gemini.
+    """
+    health_status = {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "services": {}
+    }
+    
+    # Vérifier la connexion à la base de données
+    try:
+        with engine.connect() as conn:
+            conn.execute(sqlalchemy.text("SELECT 1"))
+        health_status["services"]["database"] = "connected"
+    except Exception as e:
+        health_status["services"]["database"] = f"error: {str(e)}"
+        health_status["status"] = "unhealthy"
+    
+    # Vérifier le modèle ML
+    if MODELE_ML is not None:
+        health_status["services"]["ml_model"] = "loaded"
+    else:
+        health_status["services"]["ml_model"] = "not_loaded"
+        health_status["status"] = "degraded"
+    
+    # Vérifier la configuration Gemini
+    gemini_key = os.getenv("GOOGLE_API_KEY")
+    if gemini_key:
+        health_status["services"]["gemini_api"] = "configured"
+    else:
+        health_status["services"]["gemini_api"] = "not_configured"
+        health_status["status"] = "degraded"
+    
+    return health_status
 def root():
     return {
         "message": "API Mokpokpo opérationnelle",
