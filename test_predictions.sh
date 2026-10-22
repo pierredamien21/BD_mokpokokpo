@@ -48,9 +48,9 @@ echo ""
 
 # Test 3: Login (obtenir token)
 echo -e "${YELLOW}[TEST 3]${NC} Authentification"
-echo "curl -s -X POST $BASE_URL/auth/login -d 'username=admin&password=admin123'"
+echo "curl -s -X POST $BASE_URL/auth/login -d 'username=admin&password=${ADMIN_PASSWORD:?définir ADMIN_PASSWORD}'"
 LOGIN=$(curl -s -w "\n%{http_code}" -X POST "$BASE_URL/auth/login" \
-    -d "username=admin&password=admin123")
+    -d "username=admin&password=${ADMIN_PASSWORD:?définir ADMIN_PASSWORD}")
 HTTP_CODE=$(echo "$LOGIN" | tail -n1)
 BODY=$(echo "$LOGIN" | head -n-1)
 

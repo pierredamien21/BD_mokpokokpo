@@ -14,8 +14,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Configuration
 # API_URL = "http://localhost:8000"  # Pour tests locaux
 API_URL = "https://bd-mokpokokpo.onrender.com"  # Production Render
-ADMIN_EMAIL = "slykokou@gmail.com"
-ADMIN_PASSWORD = "admin123"
+ADMIN_EMAIL = os.environ["ADMIN_EMAIL"]
+ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 PRODUCTS_FILE = os.path.join(os.path.dirname(__file__), "..", "products_seed.json")
 
 class APIPopulator:

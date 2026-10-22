@@ -7,8 +7,8 @@ import os
 import psycopg2
 from psycopg2 import sql
 
-# Configuration de la base de données Render
-DATABASE_URL = "postgresql://postgres:BKqzqRgVhpCESb8zXbmvdJRWJBfbS2Md@dpg-d6bcpsbuibrs73ekh320-a.frankfurt-postgres.render.com/mokpokpo_bd"
+# URL de la base : variable d'environnement DATABASE_URL (voir .env.example)
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 def run_migration():
     """Exécuter la migration SQL"""

@@ -102,14 +102,7 @@ Logo:
 - PDF_LOGO_BASE64 (PNG base64)
 
 ## 9) Identifiants de test
-Admin principal:
-- slykokou@gmail.com / admin123
-
-Comptes test:
-- ADMIN: test.admin.20260224124700@mokpokpo.fr / testpass123
-- GEST_STOCK: test.stock.20260224124700@mokpokpo.fr / testpass123
-- GEST_COMMERCIAL: test.commercial.20260224124700@mokpokpo.fr / testpass123
-- CLIENT: test.client.20260224125114@mokpokpo.fr / testpass123
+Les identifiants ne sont pas versionnés : voir les variables ADMIN_EMAIL et ADMIN_PASSWORD dans `.env.example`.
 
 ## 10) Diagramme complet (flux et roles)
 

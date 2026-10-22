@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 """
 Script de test complet pour valider les corrections IA
 Tests:
@@ -60,8 +61,8 @@ def get_auth_token():
     
     # Essayer avec admin par défaut
     credentials = {
-        "username": "admin",
-        "password": "admin123"
+        "username": os.environ.get("ADMIN_USERNAME", "admin"),
+        "password": os.environ["ADMIN_PASSWORD"]
     }
     
     try:

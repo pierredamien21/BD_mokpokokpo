@@ -2,10 +2,11 @@
 """
 Script direct pour appliquer la migration sans input utilisateur
 """
+import os
 import psycopg2
 from datetime import datetime
 
-DATABASE_URL = "postgresql://postgres:BKqzqRgVhpCESb8zXbmvdJRWJBfbS2Md@dpg-d6bcpsbuibrs73ekh320-a.frankfurt-postgres.render.com/mokpokpo_bd"
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 print("=" * 70)
 print("🔄 MIGRATION: Soft Delete + URL Images (AUTO)")
